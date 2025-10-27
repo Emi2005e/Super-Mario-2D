@@ -199,15 +199,8 @@ public:
         return *this;
     }
 
-    [[nodiscard]] float getGravity() const {return gravity;}
     [[nodiscard]] float getX() const { return x; }
     [[nodiscard]] float getY() const { return y; }
-    void setGravity(float g) {
-        gravity=g;
-    }
-    void setSpeed(float s) {
-        speed=s;
-    }
 };
 
 class Enemy {
@@ -289,8 +282,6 @@ public:
         }
         return *this;
     }
-    [[nodiscard]] float getGravity() const {return gravity;}
-    [[nodiscard]] float getSpeed() const {return speed;}
     [[nodiscard]] float getX() const { return x; }
     [[nodiscard]] float getY() const { return y; }
     [[nodiscard]] bool getIsAlive() const {
