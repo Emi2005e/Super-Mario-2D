@@ -89,8 +89,6 @@ public:
     }
     [[nodiscard]] int getState() const {return state;}
     [[nodiscard]] float getJump() const {return jump;}
-    [[nodiscard]] float getGravity() const {return gravity;}
-    // FIX [unusedFunction]: Removed getSpeed()
     [[nodiscard]] float getX() const { return x; }
     [[nodiscard]] float getY() const { return y; }
 
@@ -106,11 +104,6 @@ public:
     void setState(int s) {
         state=s;
     }
-    void setJump(float j) {
-        jump=j;
-    }
-    // FIX [unusedFunction]: Removed setGravity()
-    // FIX [unusedFunction]: Removed setSpeed()
     void setX(float x) {
         this->x=x;
     }
@@ -207,7 +200,6 @@ public:
     }
 
     [[nodiscard]] float getGravity() const {return gravity;}
-    [[nodiscard]] float getSpeed() const {return speed;}
     [[nodiscard]] float getX() const { return x; }
     [[nodiscard]] float getY() const { return y; }
     void setGravity(float g) {
@@ -308,12 +300,7 @@ public:
         this->isAlive=false;
         this->speed=0;
     }
-    void setGravity(float g) {
-        gravity=g;
-    }
-    void setSpeed(float s) {
-        speed=s;
-    }
+
 };
 
 class Platform {
