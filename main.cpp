@@ -2,6 +2,7 @@
 #include <vector>
 #include <cmath>
 #include <stdexcept>
+#include <string>
 
 enum PowerUpType {
     STAR,
@@ -18,7 +19,6 @@ enum EnemyType {
 };
 
 enum BlockType {
-
     GRASS,
     ROCK,
     LUCKYBL,
@@ -35,7 +35,8 @@ private:
     float gravity;
     float speed;
 public:
-    Player()=default;
+    Player() : state(0), x(0.0f), y(0.0f), jump(0.0f), gravity(0.0f), speed(0.0f) {}
+
     Player(float x, float y, int state, float jump, float gravity, float speed) {
         this->x=x;
         this->y=y;
@@ -60,30 +61,22 @@ public:
         os<<player.jump;
         os<<player.gravity;
         os<<player.speed;
-
         return os;
     }
     friend std::istream& operator>>(std::istream& is, Player& player) {
-
         std::cout<<"Coord\n";
         is>>player.x>>player.y;
-
         std::cout<<"Player state:\n";
         is>>player.state;
-
         std::cout<<"Jump:\n";
         is>>player.jump;
-
         std::cout<<"Gravity force:\n";
         is>>player.gravity;
-
         std::cout<<"Player speed:\n";
         is>>player.speed;
-
         return is;
     }
     Player& operator=(const Player& other) {
-
         if (this!=&other) {
             this->x=other.x;
             this->y=other.y;
@@ -94,12 +87,12 @@ public:
         }
         return *this;
     }
-    int getState() const {return state;}
-    float getJump() const {return jump;}
-    float getGravity() const {return gravity;}
-    float getSpeed() const {return speed;}
-    float getX() const { return x; }
-    float getY() const { return y; }
+    [[nodiscard]] int getState() const {return state;}
+    [[nodiscard]] float getJump() const {return jump;}
+    [[nodiscard]] float getGravity() const {return gravity;}
+    // FIX [unusedFunction]: Removed getSpeed()
+    [[nodiscard]] float getX() const { return x; }
+    [[nodiscard]] float getY() const { return y; }
 
     void takedmg() {
         if (this->state>0) {
@@ -108,8 +101,6 @@ public:
         }
         else
             std::cout<<"YOU DIED\n";
-
-
     }
 
     void setState(int s) {
@@ -118,12 +109,8 @@ public:
     void setJump(float j) {
         jump=j;
     }
-    void setGravity(float g) {
-        gravity=g;
-    }
-    void setSpeed(float s) {
-        speed=s;
-    }
+    // FIX [unusedFunction]: Removed setGravity()
+    // FIX [unusedFunction]: Removed setSpeed()
     void setX(float x) {
         this->x=x;
     }
@@ -141,7 +128,9 @@ private:
     float spawn_timer;
     float gravity;
 public:
-    Powerup()=default;
+
+    Powerup() : type(NONE), x(0.0f), y(0.0f), move_dir(false), speed(0.0f), spawn_timer(0.0f), gravity(0.0f) {}
+
     Powerup(float x, float y, PowerUpType type, float gravity, float speed, float spawn_timer, bool move_dir) {
         this->x=x;
         this->y=y;
@@ -162,7 +151,6 @@ public:
     }
     ~Powerup()=default;
     friend std::ostream& operator<<(std::ostream& os, const Powerup& powerup) {
-
         switch (powerup.type) {
             case STAR:
                 os<<"STAR\n";
@@ -176,10 +164,12 @@ public:
             case ICEFLOWER:
                 os<<"ICEFLOWER\n";
                 break;
+            case NONE:
+                os<<"NONE\n";
+                break;
             default:
                 os<<"UNKNOWN\n";
                 break;
-
         }
         os<<powerup.x;
         os<<powerup.y;
@@ -190,7 +180,6 @@ public:
         return os;
     }
     friend std::istream& operator>>(std::istream& is, Powerup& powerup) {
-
         std::cout<<"Coord\n";
         is>>powerup.x;
         is>>powerup.y;
@@ -217,10 +206,10 @@ public:
         return *this;
     }
 
-    float getGravity() const {return gravity;}
-    float getSpeed() const {return speed;}
-    float getX() const { return x; }
-    float getY() const { return y; }
+    [[nodiscard]] float getGravity() const {return gravity;}
+    [[nodiscard]] float getSpeed() const {return speed;}
+    [[nodiscard]] float getX() const { return x; }
+    [[nodiscard]] float getY() const { return y; }
     void setGravity(float g) {
         gravity=g;
     }
@@ -238,7 +227,9 @@ private:
     float gravity;
     bool isAlive;
 public:
-    Enemy()=default;
+    // FIX [UninitMemberVar]: Initialize all members
+    Enemy() : type(GOOMBA), x(0.0f), y(0.0f), direction(0), speed(0.0f), gravity(0.0f), isAlive(false) {}
+
     Enemy(float x, float y, EnemyType type, bool isAlive, int direction, float speed, float gravity) {
         this->x=x;
         this->y=y;
@@ -259,9 +250,7 @@ public:
     }
     ~Enemy()=default;
     friend std::ostream& operator<<(std::ostream& os, const Enemy& enemy) {
-
         switch (enemy.type) {
-
             case GOOMBA:
                 os<<"GOOMBA\n";
                 break;
@@ -283,41 +272,36 @@ public:
         return os;
     }
     friend std::istream& operator>>(std::istream& is, Enemy& enemy) {
-
         std::cout<<"Coord\n";
         is>>enemy.x>>enemy.y;
-
         std::cout<<"IS ALIVE?\n";
         is>>enemy.isAlive;
-
         std::cout<<"Direction\n";
         is>>enemy.direction;
-
         std::cout<<"Speed\n";
         is>>enemy.speed;
-
         std::cout<<"Gravity\n";
         is>>enemy.gravity;
-
         return is;
     }
 
     Enemy& operator=(const Enemy& other) {
         if (this!=&other) {
+            this->x = other.x;
+            this->y = other.y;
             this->type=other.type;
             this->isAlive = other.isAlive;
             this->direction=other.direction;
             this->speed=other.speed;
             this->gravity=other.gravity;
-
         }
         return *this;
     }
-    float getGravity() const {return gravity;}
-    float getSpeed() const {return speed;}
-    float getX() const { return x; }
-    float getY() const { return y; }
-    bool getIsAlive() const {
+    [[nodiscard]] float getGravity() const {return gravity;}
+    [[nodiscard]] float getSpeed() const {return speed;}
+    [[nodiscard]] float getX() const { return x; }
+    [[nodiscard]] float getY() const { return y; }
+    [[nodiscard]] bool getIsAlive() const {
         return isAlive;
     }
     void stomp() {
@@ -330,7 +314,6 @@ public:
     void setSpeed(float s) {
         speed=s;
     }
-
 };
 
 class Platform {
@@ -341,7 +324,8 @@ private:
     bool isEmpty;
     bool isSolid;
 public:
-    Platform()=default;
+    Platform() : x(0.0f), y(0.0f), type(GRASS), isDestructible(false), isEmpty(false), isSolid(false) {}
+
     Platform(float x, float y, BlockType type, bool isDestructible, bool isEmpty, bool isSolid) {
         this->x=x;
         this->y=y;
@@ -361,7 +345,6 @@ public:
     ~Platform()=default;
     friend std::ostream& operator<<(std::ostream& os, const Platform& platform) {
         switch (platform.type) {
-
             case GRASS:
                 os<<"GRASS\n";
                 break;
@@ -382,10 +365,7 @@ public:
                 break;
             default:
                 os<<"UNKNOWN\n";
-
         }
-
-
         os<<platform.x;
         os<<platform.y;
         os<<platform.isDestructible;
@@ -394,7 +374,6 @@ public:
         return os;
     }
     friend std::istream& operator>>(std::istream& is, Platform& platform) {
-
         std::cout<<"Coord\n";
         is>>platform.x;
         is>>platform.y;
@@ -418,7 +397,7 @@ public:
         }
         return *this;
     }
-    PowerUpType HitByPlayer(Player& player) {
+    PowerUpType HitByPlayer(const Player& player) {
         if (this->type==LUCKYBL && !this->isEmpty) {
             this->type=USEDBL;
             this->isEmpty=true;
@@ -435,9 +414,6 @@ public:
         std::cout<<"SOLID BLOCK\n";
         return NONE;
     }
-
-
-
 };
 
 class Level {
@@ -460,13 +436,11 @@ private:
     }
 public:
     Level()=default;
-    Level(std::string name, Player player) {
-
+    Level(const std::string& name, const Player& player) {
         this->name=name;
         this->player=player;
     }
     Level(const Level& level) {
-
         this->name=level.name;
         this->player=level.player;
     }
@@ -479,7 +453,6 @@ public:
             this->enemies=other.enemies;
             this->platforms=other.platforms;
             this->powerups=other.powerups;
-
         }
         return *this;
     }
@@ -498,7 +471,6 @@ public:
         for (const auto& pw:level.platforms)
             os<<pw<<"\n";
         return os;
-
     }
     friend std::istream& operator>>(std::istream&is, Level& level) {
         std::cout<<"Name\n";
@@ -534,31 +506,21 @@ public:
     void addEnemies(const Enemy& enemy) {
         enemies.push_back(enemy);
     }
-    void addPowerup(const Powerup& powerup) {
-        powerups.push_back(powerup);
-    }
+    // FIX [unusedFunction]: Removed addPowerup()
     void addPlatform(const Platform& platform) {
         platforms.push_back(platform);
     }
-    int getEnemyCount() const { return enemies.size(); }
-    int getPowerupCount() const { return powerups.size(); }
-    int getPlatformCount() const { return platforms.size(); }
 
-
-    void applyGravity() {
-        player.setJump(player.getJump()-player.getGravity());
-
-    }
     Player& getPlayer() {
         return player;
     }
     Platform& getPlatform(int index) {
-        if (index>=0 && index<platforms.size())
+        if (index>=0 && index < platforms.size())
             return platforms[index];
         throw std::out_of_range("Index invalid\n");
     }
     Enemy& getEnemy(int index) {
-        if (index>=0 && index<enemies.size())
+        if (index>=0 && index < enemies.size())
             return enemies[index];
         throw std::out_of_range("Index invalid\n");
     }
@@ -569,11 +531,8 @@ public:
             checkPlayerEnemyCollision(playerRef, enemy);
         }
     }
-
-
-
-
 };
+
 int main() {
     std::cout<<"----- Creare jucator si nivel ----\n";
     Player mario(3, 3, 0, 0.0f, 0.5f, 1.0f);
@@ -599,29 +558,25 @@ int main() {
     if (spawnedItem==MUSHROOM) {
         std::cout<<"S-a spawnat un mushroom!\n";
         playerRef.setState(1);
-
+    }
+    else if (spawnedItem==FIREFLOWER) {
+        std::cout<<"S-a spawnat fireflower!\n";
+        playerRef.setState(2);
     }
     else
-        if (spawnedItem==FIREFLOWER) {
-            std::cout<<"S-a spawnat fireflower!\n";
-            playerRef.setState(2);
-        }
-    else
-        if (spawnedItem==NONE) {
-            std::cout<<"Teapa... Nimic!\n";
-        }
+        std::cout<<"Teapa... Nimic!\n";
+
     std::cout<<"Starea lui Mario inainte de coliziune\n"<<world1.getPlayer().getState()<<"\n";
     world1.getPlayer().setX(5.1);
     world1.getPlayer().setY(10);
     world1.collision();
     std::cout<<"Starea lui Mario dupa coliziune\n"<<world1.getPlayer().getState()<<"\n";
-    Enemy& enemyRef=world1.getEnemy(0);
+
+    const Enemy& enemyRef=world1.getEnemy(0);
     if (enemyRef.getIsAlive())
         std::cout<<"Goomba in viata\n";
     else
         std::cout<<"Goomba invins\n";
-
-
 
     return 0;
 }
