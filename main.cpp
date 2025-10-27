@@ -37,13 +37,13 @@ private:
 public:
     Player() : state(0), x(0.0f), y(0.0f), jump(0.0f), gravity(0.0f), speed(0.0f) {}
 
-    Player(float x, float y, int state, float jump, float gravity, float speed) {
-        this->x=x;
-        this->y=y;
-        this->state=state;
-        this->jump=jump;
-        this->gravity=gravity;
-        this->speed=speed;
+    Player(float in_x, float in_y, int in_state, float in_jump, float in_gravity, float in_speed) {
+        this->x = in_x;
+        this->y = in_y;
+        this->state = in_state;
+        this->jump = in_jump;
+        this->gravity = in_gravity;
+        this->speed = in_speed;
     }
     Player(const Player& player) {
         this->x=player.x;
@@ -104,11 +104,13 @@ public:
     void setState(int s) {
         state=s;
     }
-    void setX(float x) {
-        this->x=x;
+
+    void setX(float newX) {
+        x = newX;
     }
-    void setY(float y) {
-        this->y=y;
+
+    void setY(float newY) {
+        y = newY;
     }
 };
 
@@ -124,14 +126,14 @@ public:
 
     Powerup() : type(NONE), x(0.0f), y(0.0f), move_dir(false), speed(0.0f), spawn_timer(0.0f), gravity(0.0f) {}
 
-    Powerup(float x, float y, PowerUpType type, float gravity, float speed, float spawn_timer, bool move_dir) {
-        this->x=x;
-        this->y=y;
-        this->type=type;
-        this->gravity=gravity;
-        this->speed=speed;
-        this->move_dir=move_dir;
-        this->spawn_timer=spawn_timer;
+    Powerup(float in_x, float in_y, PowerUpType in_type, float in_gravity, float in_speed, float in_spawn_timer, bool in_move_dir) {
+        this->x = in_x;
+        this->y = in_y;
+        this->type = in_type;
+        this->gravity = in_gravity;
+        this->speed = in_speed;
+        this->move_dir = in_move_dir;
+        this->spawn_timer = in_spawn_timer;
     }
     Powerup(const Powerup& powerup) {
         this->x=powerup.x;
@@ -212,17 +214,16 @@ private:
     float gravity;
     bool isAlive;
 public:
-    // FIX [UninitMemberVar]: Initialize all members
     Enemy() : type(GOOMBA), x(0.0f), y(0.0f), direction(0), speed(0.0f), gravity(0.0f), isAlive(false) {}
 
-    Enemy(float x, float y, EnemyType type, bool isAlive, int direction, float speed, float gravity) {
-        this->x=x;
-        this->y=y;
-        this->type=type;
-        this->isAlive=isAlive;
-        this->direction=direction;
-        this->speed=speed;
-        this->gravity=gravity;
+    Enemy(float in_x, float in_y, EnemyType in_type, bool in_isAlive, int in_direction, float in_speed, float in_gravity) {
+        this->x = in_x;
+        this->y = in_y;
+        this->type = in_type;
+        this->isAlive = in_isAlive;
+        this->direction = in_direction;
+        this->speed = in_speed;
+        this->gravity = in_gravity;
     }
     Enemy(const Enemy& enemy) {
         this->x=enemy.x;
@@ -304,13 +305,13 @@ private:
 public:
     Platform() : x(0.0f), y(0.0f), type(GRASS), isDestructible(false), isEmpty(false), isSolid(false) {}
 
-    Platform(float x, float y, BlockType type, bool isDestructible, bool isEmpty, bool isSolid) {
-        this->x=x;
-        this->y=y;
-        this->type=type;
-        this->isDestructible=isDestructible;
-        this->isEmpty=isEmpty;
-        this->isSolid=isSolid;
+    Platform(float in_x, float in_y, BlockType in_type, bool in_isDestructible, bool in_isEmpty, bool in_isSolid) {
+        this->x = in_x;
+        this->y = in_y;
+        this->type = in_type;
+        this->isDestructible = in_isDestructible;
+        this->isEmpty = in_isEmpty;
+        this->isSolid = in_isSolid;
     }
     Platform(const Platform& platform) {
         this->x=platform.x;
@@ -423,7 +424,6 @@ public:
         this->player=level.player;
     }
     ~Level()=default;
-
     Level& operator=(const Level& other) {
         if (this!=&other) {
             this->name=other.name;
@@ -484,7 +484,6 @@ public:
     void addEnemies(const Enemy& enemy) {
         enemies.push_back(enemy);
     }
-    // FIX [unusedFunction]: Removed addPowerup()
     void addPlatform(const Platform& platform) {
         platforms.push_back(platform);
     }
@@ -545,7 +544,8 @@ int main() {
         std::cout<<"Teapa... Nimic!\n";
 
     std::cout<<"Starea lui Mario inainte de coliziune\n"<<world1.getPlayer().getState()<<"\n";
-    world1.getPlayer().setX(5.1);
+
+    world1.getPlayer().setX(5.1f);
     world1.getPlayer().setY(10);
     world1.collision();
     std::cout<<"Starea lui Mario dupa coliziune\n"<<world1.getPlayer().getState()<<"\n";
