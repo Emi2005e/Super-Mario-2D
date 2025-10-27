@@ -493,12 +493,12 @@ public:
         return player;
     }
     Platform& getPlatform(int index) {
-        if (index>=0 && index < platforms.size())
+        if (index>=0 && static_cast<size_t>(index) < platforms.size())
             return platforms[index];
         throw std::out_of_range("Index invalid\n");
     }
     Enemy& getEnemy(int index) {
-        if (index>=0 && index < enemies.size())
+        if (index>=0 && static_cast<size_t>(index) < enemies.size())
             return enemies[index];
         throw std::out_of_range("Index invalid\n");
     }
