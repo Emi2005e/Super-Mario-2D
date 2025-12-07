@@ -1,1 +1,5 @@
+<<<<<<< HEAD
+=======
+generated/** linguist-generated
+>>>>>>> upstream/sfml3.0
 ext/** linguist-vendored

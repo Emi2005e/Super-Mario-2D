@@ -1,29 +1,17 @@
 #!/usr/bin/bash
 
-INPUT_FILE=${INPUT_FILE:-tastatura.txt}
-RUN_INTERACTIVE=${RUN_INTERACTIVE:-false}
-BUILD_DIR=${BUILD_DIR:-build}
+# remove --show-leak-kinds=all (and --track-origins=yes) if there are many leaks in external libs
+INPUT_FILENAME=${INPUT_FILENAME:-tastatura.txt}
+ZIP_NAME=${ZIP_NAME:-install_dir/bin}
 EXECUTABLE_NAME=${EXECUTABLE_NAME:-oop}
 
-if [[ -n "$1" ]]; then
-    BIN_DIR="$1"
-elif [[ -d "install_dir/bin" ]]; then
-    BIN_DIR="install_dir/bin"
-else
-    BIN_DIR="${BUILD_DIR}"
-fi
-
-run_valgrind() {
-    # remove --show-leak-kinds=all (and --track-origins=yes) if there are many leaks in external libs
-    valgrind --leak-check=full \
-            --show-leak-kinds=all \
-            --track-origins=yes \
-            --error-exitcode=1 \
-            ./"${BIN_DIR}"/"${EXECUTABLE_NAME}"
-}
-
-if [[ "${RUN_INTERACTIVE}" = true ]]; then
-    run_valgrind
-else
-    cat < "${INPUT_FILE}" | tr -d '\r' | run_valgrind
-fi
+tr -d '\r' < "${INPUT_FILENAME}" | \
+  valgrind --leak-check=full \
+           --gen-suppressions=all \
+           --show-leak-kinds=all \
+           --leak-resolution=med \
+           --track-origins=yes \
+           --vgdb=no \
+           --suppressions=./scripts/valgrind-suppressions.supp \
+           --error-exitcode=0 ./"${ZIP_NAME}"/"${EXECUTABLE_NAME}" &
+bash ./scripts/run_test.sh 13 1 2

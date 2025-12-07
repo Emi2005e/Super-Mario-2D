@@ -17,21 +17,20 @@ runs:
   using: "composite"
   steps:
     # Uncomment when using external dependencies, so they will be cached
-    # - name: Cache deps
-    #   uses: actions/cache@v4
-    #   id: cache-deps
-    #   # make the key depend on the dependency version
-    #   with:
-    #     path: |
-    #       ${{ env.BUILD_DIR }}/_deps
-    #     key: ${{ inputs.cache_key }}-${{ matrix.cmake_generator }}-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.asan_name }}-${{ env.BUILD_TYPE }}
+    - name: Cache deps
+      uses: actions/cache@v4
+      id: cache-deps
+      # make the key depend on the dependency version
+      with:
+        path: |
+          ${{ env.BUILD_DIR }}/_deps
+        key: ${{ inputs.cache_key }}-${{ matrix.cmake_generator }}-${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.asan_name }}-${{ env.BUILD_TYPE }}-${{ env.SFML_VERSION }}
 
     # NOTE: GH Actions does not allow updating the cache yet
     # Using the workaround found here: https://github.com/actions/cache/issues/171
     # Since this cache is small, it should not fill the cache too much
     - name: Cache Ninja deps
-      # renovate: datasource=github-tags depName=actions/cache versioning=loose
-      uses: actions/cache@v4.2.4
+      uses: actions/cache@v4
       if: matrix.cmake_generator == 'Ninja'
       id: cache-deps-ninja
       with:
@@ -42,8 +41,7 @@ runs:
         restore-keys: ${{ matrix.os }}-${{ matrix.cxx }}-${{ matrix.asan_name }}-ninja-cache-
 
     - name: Cache MinGW
-      # renovate: datasource=github-tags depName=actions/cache versioning=loose
-      uses: actions/cache@v4.2.4
+      uses: actions/cache@v4
       id: cache-mingw
       if: runner.os == 'Windows' && matrix.cxx == 'g++'
       with:
@@ -51,7 +49,6 @@ runs:
         key: ${{ runner.os }}-${{ env.MINGW_VER }}
 
     - name: Download toolchain (MinGW)
-      # renovate: datasource=github-tags depName=suisei-cn/actions-download-file versioning=loose
       uses: suisei-cn/actions-download-file@v1.6.0
       id: download-mingw-gcc
       if: runner.os == 'Windows' && matrix.cxx == 'g++' && steps.cache-mingw.outputs.cache-hit != 'true'

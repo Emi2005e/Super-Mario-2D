@@ -4,9 +4,12 @@ description: 'Install and run cppcheck'
 runs:
   using: "composite"
   steps:
+    - name: Install Linux Dependencies
+      if: runner.os == 'Linux'
+      uses: ./.github/actions/install-linux-deps
+
     - name: Cache cppcheck
-      # renovate: datasource=github-tags depName=actions/cache versioning=loose
-      uses: actions/cache/restore@v4.2.4
+      uses: actions/cache/restore@v4
       id: cache-cppcheck
       with:
         path: cppcheck
@@ -19,8 +22,7 @@ runs:
         bash ./scripts/build_cppcheck.sh -v ${CPPCHECK_VER}
 
     - name: Save cppcheck cache
-      # renovate: datasource=github-tags depName=actions/cache versioning=loose
-      uses: actions/cache/save@v4.2.4
+      uses: actions/cache/save@v4
       if: steps.cache-cppcheck.outputs.cache-hit != 'true'
       with:
         path: cppcheck
