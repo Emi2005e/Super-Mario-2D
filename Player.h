@@ -1,10 +1,9 @@
 #ifndef PROIECT_POO_PLAYER_H
 #define PROIECT_POO_PLAYER_H
 
-#include <iostream>
 #include <SFML/Graphics.hpp>
 
-const float SCALE = 60.0f;
+constexpr float SCALE = 60.0f;
 
 class Player {
 private:
@@ -59,8 +58,7 @@ public:
 
     [[nodiscard]] int   getState() const;
     [[nodiscard]] float getJump() const;
-    [[nodiscard]] float getX() const;
-    [[nodiscard]] float getY() const;
+
 
     sf::Sprite& getSprite();
     sf::FloatRect getGlobalBounds() const;

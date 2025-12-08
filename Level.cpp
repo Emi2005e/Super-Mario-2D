@@ -1,9 +1,8 @@
 #include "Level.h"
 #include "Exceptions.h"
 #include <fstream>
-#include <iostream>
 
-Level::Level() {}
+Level::Level()=default;
 
 Level::Level(const Level& other) {
     platforms = other.platforms;
@@ -41,23 +40,22 @@ void Level::addEnemy(Enemy* enemy) {
     enemies.push_back(enemy);
 }
 
-void Level::addPlatform(Platform platform) {
+void Level::addPlatform(const Platform& platform) {
     platforms.push_back(platform);
 }
 
 
-void Level::handleEnemyPlatformCollision(Enemy* enemy, bool isXAxis) {
-    sf::FloatRect eBounds = enemy->getGlobalBounds();
-    float buffer = 0.1f;
+void Level::handleEnemyPlatformCollision(Enemy* enemy, bool isXAxis) const {
+    const sf::FloatRect eBounds = enemy->getGlobalBounds();
 
     for (const auto& platform : platforms) {
         sf::FloatRect bBounds = platform.getGlobalBounds();
         sf::FloatRect sensorBounds = eBounds;
 
         if (isXAxis) {
-            float safeZoneRatio = 0.4f;
-            float sensorHeight = eBounds.size.y * safeZoneRatio;
-            float verticalMargin = (eBounds.size.y - sensorHeight) / 2.0f;
+            constexpr float safeZoneRatio = 0.4f;
+            const float sensorHeight = eBounds.size.y * safeZoneRatio;
+            const float verticalMargin = (eBounds.size.y - sensorHeight) / 2.0f;
 
             sensorBounds.position.y += verticalMargin;
             sensorBounds.size.y = sensorHeight;
@@ -74,6 +72,7 @@ void Level::handleEnemyPlatformCollision(Enemy* enemy, bool isXAxis) {
 
         if (sensorBounds.findIntersection(bBounds)) {
             if (isXAxis) {
+                float buffer = 0.1f;
                 float halfW = eBounds.size.x / 2.0f;
                 float eCenterX = eBounds.position.x + halfW;
                 float bCenterX = bBounds.position.x + (bBounds.size.x / 2.0f);
@@ -150,14 +149,14 @@ void Level::update(Player& player, float dt) {
     player.updateAnimation(dt);
 }
 
-void Level::draw(sf::RenderWindow& window) {
+void Level::draw(sf::RenderWindow& window) const {
     for (auto* enemy : enemies) enemy->draw(window);
     for (auto* p : powerups) p->draw(window);
     for (auto& platform : platforms) platform.draw(window);
 }
 
-void Level::handlePlayerInteractions(Player& player) {
-    sf::FloatRect pBounds = player.getGlobalBounds();
+void Level::handlePlayerInteractions(Player& player) const {
+    const sf::FloatRect pBounds = player.getGlobalBounds();
 
     for (auto* enemy : enemies) {
         if (!enemy->getIsAlive()) continue;
@@ -167,7 +166,12 @@ void Level::handlePlayerInteractions(Player& player) {
         auto inter = pBounds.findIntersection(eBounds);
         if (!inter) continue;
 
-        // SFML 3.0: size.x/y
+        if (dynamic_cast<Koopa*>(enemy)) {
+            Koopa::incrementCastCount();
+            std::cout << "Downcast Koopa [" << Koopa::getKoopaCastCount() << "]\n";
+        }
+
+
         bool stomp = inter->size.x > inter->size.y && player.getJump() > 0;
 
         if (stomp && enemy->canBeStomped()) {
@@ -187,8 +191,6 @@ void Level::handlePlayerPlatformCollision(Player& player, bool isXAxis) {
     float pHalfW = pBounds.size.x / 2.0f;
     float pHalfH = pBounds.size.y / 2.0f;
 
-    float skin = 2.0f;
-
     for (auto& platform : platforms) {
         sf::FloatRect bBounds = platform.getGlobalBounds();
 
@@ -199,6 +201,7 @@ void Level::handlePlayerPlatformCollision(Player& player, bool isXAxis) {
             checkBounds.size.y -= 12.0f;
         }
         else {
+            float skin = 2.0f;
             checkBounds.position.x += skin;
             checkBounds.size.x -= skin * 2;
         }
@@ -250,22 +253,21 @@ void Level::loadFromFile(const std::string& filename) {
     std::string line;
     int y = 0;
     while (std::getline(file, line)) {
-        for (int x = 0; x < (int)line.size(); x++) {
-            char c = line[x];
-            switch (c) {
+        for (int x = 0; x < static_cast<int>(line.size()); x++) {
+            switch (line[x]) {
                 case '#': platforms.emplace_back(x, y, BRICK, false, false, true); break;
                 case 'R': platforms.emplace_back(x, y, ROCK, false, false, true); break;
                 case 'L': platforms.emplace_back(x, y, LUCKYBL, false, false, true); break;
-                case 'S': { Platform p(x, y, LUCKYBL, false, false, true);
+                case 'S': { Platform p(static_cast<float>(x), static_cast<float>(y), LUCKYBL, false, false, true);
                             p.setForcedReward(STAR);
                             platforms.push_back(p);
                           } break;
                 case 'U': platforms.emplace_back(x, y, USEDBL, false, true, true); break;
                 case '|': platforms.emplace_back(x, y, PIPE, false, false, true); break;
                 case 'T': platforms.emplace_back(x, y, PIPETOP, false, false, true); break;
-                case 'G': enemies.push_back(new Goomba(x, y, x - 3, x + 3)); break;
-                case 'K': enemies.push_back(new Koopa(x, y, x - 4, x + 4)); break;
-                case 'P': enemies.push_back(new PiranhaPlant(x, y, 1, 1)); break;
+                case 'G': enemies.push_back(new Goomba(static_cast<float>(x), static_cast<float>(y), static_cast<float>(x) - 3, static_cast<float>(x) + 3)); break;
+                case 'K': enemies.push_back(new Koopa(static_cast<float>(x), static_cast<float>(y), static_cast<float>(x) - 4, static_cast<float>(x) + 4)); break;
+                case 'P': enemies.push_back(new PiranhaPlant(static_cast<float>(x), static_cast<float>(y), 1, 1)); break;
                 default: break;
             }
         }

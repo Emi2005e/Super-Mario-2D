@@ -1,8 +1,7 @@
 #include "Powerup.h"
-#include <iostream>
 #include "Exceptions.h"
 
-const float scale = 60.0f;
+constexpr float scale = 60.0f;
 
 Powerup::Powerup(float startX, float startY, PowerUpType type)
     : x(startX), y(startY), type(type), sprite(nullptr)
@@ -61,7 +60,7 @@ Powerup::Powerup(const Powerup& other)
       velocityY(other.velocityY), speed(other.speed),
       active(other.active), spawning(other.spawning),
       spawnTargetY(other.spawnTargetY),
-      type(other.type), texture(other.texture), sprite(nullptr)
+      type(other.type), sprite(nullptr), texture(other.texture)
 {
     sprite = new sf::Sprite(texture);
     sprite->setPosition({px, py});
@@ -83,7 +82,7 @@ Powerup& Powerup::operator=(const Powerup& other) {
         type = other.type;
         texture = other.texture;
 
-        if (sprite) delete sprite;
+        delete sprite;
         sprite = new sf::Sprite(texture);
         sprite->setPosition({px, py});
     }
@@ -146,7 +145,7 @@ void Powerup::update(float dt, const std::vector<Platform>& platforms) {
     playerBounds.position.x = px;
     playerBounds.position.y = nextPy;
 
-    bool collisionY = false;
+
     for (const auto& platform : platforms) {
         sf::FloatRect wallBounds = platform.getGlobalBounds();
 
@@ -156,8 +155,6 @@ void Powerup::update(float dt, const std::vector<Platform>& platforms) {
 
                 //se pune pe bloc
                 nextPy = wallBounds.position.y - playerBounds.size.y / 2.0f;
-
-                collisionY = true;
 
                 if (type == STAR) {
                     velocityY = -1000.0f; //sare
@@ -174,7 +171,7 @@ void Powerup::update(float dt, const std::vector<Platform>& platforms) {
     sprite->setPosition({px, py});
 }
 
-void Powerup::draw(sf::RenderWindow& window) {
+void Powerup::draw(sf::RenderWindow& window) const {
     if (active && sprite)
         window.draw(*sprite);
 }

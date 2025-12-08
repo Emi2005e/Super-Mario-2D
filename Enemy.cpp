@@ -54,7 +54,7 @@ void Enemy::changeDirection() {
     // else sprite->setScale({-1.5f, 1.5f});
 }
 
-sf::Sprite& Enemy::getSprite() {
+sf::Sprite& Enemy::getSprite() const {
     return *sprite;
 }
 
@@ -92,7 +92,9 @@ Goomba::Goomba(float startX, float startY, float limStanga, float limDreapta)
         throw ResourceException("Lipsa goomba.png");
 
     image.createMaskFromColor(sf::Color::White);
-    texture.loadFromImage(image);
+    if (!texture.loadFromImage(image)) {
+        throw GameException("Eroare textura goomba");
+    }
 
     sprite = new sf::Sprite(texture);
 
@@ -148,7 +150,9 @@ Koopa::Koopa(float startX, float startY, float limStanga, float limDreapta)
     if (!image.loadFromFile("koopa.png"))
         throw ResourceException("Lipsa koopa.png");
 
-    texture.loadFromImage(image);
+    if (!texture.loadFromImage(image)) {
+        throw GameException("Eroare textura Koopa");
+    }
     sprite = new sf::Sprite(texture);
 
     auto bounds = sprite->getLocalBounds();
@@ -164,10 +168,10 @@ Koopa::Koopa(float startX, float startY, float limStanga, float limDreapta)
 void Koopa::update(float dt) {
 
 
-    bool movingLeft = (speed > 0); // x -= speed,pozitiv = stânga
+// x -= speed,pozitiv = stânga
 
     // Flip Sprite
-    if (movingLeft) sprite->setScale({0.05f, 0.05f});
+    if (speed>0) sprite->setScale({0.05f, 0.05f});
     else sprite->setScale({-0.05f, 0.05f});
 
     x -= speed * dt * 60.f;
@@ -193,7 +197,9 @@ PiranhaPlant::PiranhaPlant(float startX, float startY, float limSus, float limJo
     if (!image.loadFromFile("plant.png"))
         throw ResourceException("Lipsa plant.png");
 
-    texture.loadFromImage(image);
+    if (!texture.loadFromImage(image)) {
+        throw GameException("Eroare textura plant");
+    }
 
     sprite = new sf::Sprite(texture);
 
@@ -239,3 +245,4 @@ void PiranhaPlant::update(float dt) {
 
 void PiranhaPlant::reaction() { std::cout << "DAMAGE!\n"; }
 Enemy* PiranhaPlant::clone() const { return new PiranhaPlant(*this); }
+int Koopa::koopaCastCount = 0;

@@ -86,7 +86,7 @@ Player& Player::operator=(const Player& other) {
 
         setState(state);
 
-        if (sprite) delete sprite;
+        delete sprite;
         sprite = new sf::Sprite(*pCurrentIdle);
         sprite->setScale({1.5f, 1.5f});
         sprite->setPosition({px, py});
@@ -217,6 +217,8 @@ void Player::setState(int s) {
         case 0: pCurrentIdle = &texIdle; pCurrentRun1 = &texRun1; pCurrentRun2 = &texRun2; break;
         case 1: pCurrentIdle = &bigIdle; pCurrentRun1 = &bigRun1; pCurrentRun2 = &bigRun2; break;
         case 2: pCurrentIdle = &fireIdle; pCurrentRun1 = &fireRun1; pCurrentRun2 = &fireRun2; break;
+        default:
+            pCurrentIdle = &texIdle; pCurrentRun1 = &texRun1; pCurrentRun2 = &texRun2; break;
     }
 
     if (sprite) sprite->setTexture(*pCurrentIdle);

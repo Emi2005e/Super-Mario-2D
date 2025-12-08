@@ -3,8 +3,6 @@
 #include <SFML/Graphics.hpp>
 
 #include "Player.h"
-#include "Enemy.h"
-#include "Platform.h"
 #include "Level.h"
 
 int main() {

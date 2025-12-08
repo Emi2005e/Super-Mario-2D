@@ -7,18 +7,22 @@
 
 #include <exception>
 #include <string>
+#include <utility>
 
 class GameException : public std::exception {
 protected:
     std::string msg;
 public:
-    GameException(const std::string& m) : msg(m) {}
-    virtual const char* what() const noexcept override { return msg.c_str(); }
+    explicit GameException(std::string m) : msg(std::move(m)) {}
+
+
+    [[nodiscard]] const char* what() const noexcept override { return msg.c_str(); }
 };
 
 class ResourceException : public GameException {
 public:
-    ResourceException(const std::string& filename)
+
+    explicit ResourceException(const std::string& filename)
         : GameException("Lipseste: " + filename) {}
 };
 
@@ -29,7 +33,9 @@ public:
 
 class LevelLoadException : public GameException {
 public:
-    LevelLoadException(const std::string& filename)
+
+    explicit LevelLoadException(const std::string& filename)
         : GameException("Critical Error: Cannot open level file -> " + filename) {}
 };
+
 #endif //PROIECT_POO_EXCEPTIONS_H

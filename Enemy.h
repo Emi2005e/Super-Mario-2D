@@ -1,7 +1,7 @@
 #ifndef PROIECT_POO_ENEMY_H
 #define PROIECT_POO_ENEMY_H
 
-#include <iostream>
+
 #include <SFML/Graphics.hpp>
 
 class Enemy {
@@ -29,7 +29,7 @@ public:
     void setY(float newY);
     void setX(float newX);
     void changeDirection();
-    sf::Sprite& getSprite();
+    sf::Sprite& getSprite() const;
 
     [[nodiscard]] float getX() const;
     [[nodiscard]] float getY() const;
@@ -62,11 +62,14 @@ public:
 class Koopa : public Enemy {
 private:
     float limStanga, limDreapta;
+    static int koopaCastCount;
 public:
     Koopa(float startX, float startY, float limStanga, float limDreapta);
     void update(float dt) override;
     void reaction() override;
     Enemy* clone() const override;
+    static int getKoopaCastCount() { return koopaCastCount; }
+    static void incrementCastCount() { koopaCastCount++; }
 };
 
 

@@ -31,7 +31,7 @@ public:
 
     void loadTextureForType(BlockType blockType);
 
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window) const;
     sf::FloatRect getGlobalBounds() const;
 
     BlockType getType() const { return type; }

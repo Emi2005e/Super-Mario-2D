@@ -29,7 +29,7 @@ public:
     Powerup& operator=(const Powerup& other);
 
     void update(float dt, const std::vector<Platform>& platforms);
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window) const;
     sf::FloatRect getGlobalBounds() const;
 
     bool isActive() const { return active; }

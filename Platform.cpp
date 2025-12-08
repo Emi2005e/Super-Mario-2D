@@ -50,7 +50,7 @@ Platform& Platform::operator=(const Platform& other) {
         forcedReward = other.forcedReward;
         texture = other.texture;
 
-        if (sprite) delete sprite;
+        delete sprite;
         sprite = new sf::Sprite(texture);
         sprite->setPosition({x * SCALE, y * SCALE});
         if (other.sprite) {
@@ -77,7 +77,10 @@ void Platform::loadTextureForType(BlockType blockType) {
     if (!image.loadFromFile(filename))
         throw ResourceException("Lipsa png platforma");
 
-    texture.loadFromImage(image);
+
+    if (!texture.loadFromImage(image)) {
+        throw ResourceException("Eroare la crearea texturii platformei");
+    }
 
     if (!sprite)
         sprite = new sf::Sprite(texture);
@@ -121,7 +124,7 @@ PowerUpType Platform::HitByPlayer(const Player& player) {
     return NONE;
 }
 
-void Platform::draw(sf::RenderWindow& window) {
+void Platform::draw(sf::RenderWindow& window) const {
     if (sprite)
         window.draw(*sprite);
 }
