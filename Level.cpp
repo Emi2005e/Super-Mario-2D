@@ -36,13 +36,13 @@ Level::~Level() {
     powerups.clear();
 }
 
-void Level::addEnemy(Enemy* enemy) {
-    enemies.push_back(enemy);
-}
-
-void Level::addPlatform(const Platform& platform) {
-    platforms.push_back(platform);
-}
+// void Level::addEnemy(Enemy* enemy) {
+//     enemies.push_back(enemy);
+// }
+//
+// void Level::addPlatform(const Platform& platform) {
+//     platforms.push_back(platform);
+// }
 
 
 void Level::handleEnemyPlatformCollision(Enemy* enemy, bool isXAxis) const {

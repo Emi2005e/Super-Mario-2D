@@ -22,8 +22,8 @@ public:
     Level& operator=(const Level& other);
     ~Level();
 
-    void addEnemy(Enemy* enemy);
-    void addPlatform(const Platform& platform);
+    // void addEnemy(Enemy* enemy);
+    // void addPlatform(const Platform& platform);
 
     void update(Player& player, float dt);
     void draw(sf::RenderWindow& window) const;

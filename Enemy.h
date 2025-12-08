@@ -31,8 +31,8 @@ public:
     void changeDirection();
     sf::Sprite& getSprite() const;
 
-    [[nodiscard]] float getX() const;
-    [[nodiscard]] float getY() const;
+    // [[nodiscard]] float getX() const;
+    // [[nodiscard]] float getY() const;
     [[nodiscard]] bool getIsAlive() const;
     void kill();
 

@@ -229,9 +229,9 @@ void Player::setState(int s) {
     }
 }
 
-float Player::getPrevX() const { return prevX; }
-float Player::getPrevY() const { return prevY; }
-sf::FloatRect Player::getOldBounds() const { return oldBounds; }
+// float Player::getPrevX() const { return prevX; }
+// float Player::getPrevY() const { return prevY; }
+// sf::FloatRect Player::getOldBounds() const { return oldBounds; }
 
 void Player::setX(float newX) {
     x = newX;

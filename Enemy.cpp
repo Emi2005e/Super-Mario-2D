@@ -71,8 +71,8 @@ void Enemy::doDraw(sf::RenderWindow& window) {
     window.draw(*sprite);
 }
 
-float Enemy::getX() const { return x; }
-float Enemy::getY() const { return y; }
+// float Enemy::getX() const { return x; }
+// float Enemy::getY() const { return y; }
 bool Enemy::getIsAlive() const { return isAlive; }
 void Enemy::kill() { isAlive = false; }
 

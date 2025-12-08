@@ -35,14 +35,14 @@ public:
     sf::FloatRect getGlobalBounds() const;
 
     BlockType getType() const { return type; }
-    void setType(BlockType newType) {
-        type = newType;
-    }
+    // void setType(BlockType newType) {
+    //     type = newType;
+    // }
 
-    bool getIsSolid() const { return isSolid; }
-    void setIsSolid(bool solid) { isSolid = solid; }
-    bool getIsEmpty() const { return isEmpty; }
-    void setIsEmpty(bool empty) { isEmpty = empty; }
+    // bool getIsSolid() const { return isSolid; }
+    // void setIsSolid(bool solid) { isSolid = solid; }
+    // bool getIsEmpty() const { return isEmpty; }
+    // void setIsEmpty(bool empty) { isEmpty = empty; }
     void setForcedReward(PowerUpType reward) { forcedReward = reward; }
 
 

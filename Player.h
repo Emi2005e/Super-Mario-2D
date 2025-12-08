@@ -69,9 +69,9 @@ public:
     void setY(float newY);
     void setOnGround(bool g);
 
-    sf::FloatRect getOldBounds() const;
-    float getPrevX() const;
-    float getPrevY() const;
+    // sf::FloatRect getOldBounds() const;
+    // float getPrevX() const;
+    // float getPrevY() const;
 
     void setJump(float newJump) { jump = newJump; }
     void bounce();
