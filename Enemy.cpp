@@ -1,23 +1,74 @@
 #include "Enemy.h"
+#include "Player.h"
 #include <iostream>
 #include "Exceptions.h"
+
 int Enemy::enemyCount = 0;
 
-Enemy::Enemy() : x(0), y(0), speed(0), isAlive(true) {enemyCount++;}
+Enemy::Enemy()
+    : x(0), y(0), speed(0), isAlive(true), sprite(nullptr)
+{
+    enemyCount++;
+}
 
-Enemy::Enemy(float startX, float startY, float startSpeed) : x(startX), y(startY), speed(startSpeed), isAlive(true) {}
+Enemy::Enemy(float startX, float startY, float startSpeed)
+    : x(startX), y(startY), speed(startSpeed), isAlive(true), sprite(nullptr)
+{
+    enemyCount++;
+}
 
-void Enemy::draw(sf::RenderWindow& window) {
-    if (isAlive) {
-        sprite.setPosition(x*60.0f, y*60.0f);
-        window.draw(sprite);
-        doDraw(window);
+Enemy::~Enemy() {
+    delete sprite;
+    sprite = nullptr;
+    enemyCount--;
+}
+
+void Enemy::setX(float newX) {
+    x = newX;
+    // Important: Actualizăm și poziția vizuală (Sprite-ul)
+    // Calculăm pixelii (x * SCALE) și păstrăm Y-ul curent
+    if(sprite) {
+        float currentPixelY = sprite->getPosition().y;
+        sprite->setPosition({x * SCALE, currentPixelY});
     }
 }
 
+void Enemy::setY(float newY) {
+    y = newY;
+    // CRITIC: Actualizăm sprite-ul imediat pentru ca următoarele verificări de coliziune
+    // din același frame (Level::update are mai multe pass-uri) să fie corecte.
+    if(sprite) {
+        float currentPixelX = sprite->getPosition().x;
+        sprite->setPosition({currentPixelX, y * SCALE});
+    }
+}
+
+
+
+void Enemy::changeDirection() {
+    // Inversăm viteza (presupunând că ai o variabilă 'speed' sau 'velocity')
+    speed = -speed;
+
+    // Opțional: Poți face flip la sprite aici dacă vrei
+    // if (speed > 0) sprite->setScale({1.5f, 1.5f});
+    // else sprite->setScale({-1.5f, 1.5f});
+}
+
+sf::Sprite& Enemy::getSprite() {
+    return *sprite;
+}
+
+void Enemy::draw(sf::RenderWindow& window) {
+    if (!isAlive || !sprite) return;
+    sprite->setPosition({x * 60.f, y * 60.f});
+    window.draw(*sprite);
+    doDraw(window);
+}
+
 void Enemy::doDraw(sf::RenderWindow& window) {
-    sprite.setPosition(x * 60.0f, y * 60.0f);
-    window.draw(sprite);
+    if (!sprite) return;
+    sprite->setPosition({x * 60.f, y * 60.f});
+    window.draw(*sprite);
 }
 
 float Enemy::getX() const { return x; }
@@ -26,141 +77,165 @@ bool Enemy::getIsAlive() const { return isAlive; }
 void Enemy::kill() { isAlive = false; }
 
 sf::FloatRect Enemy::getGlobalBounds() const {
-    return sprite.getGlobalBounds();
+    return sprite ? sprite->getGlobalBounds() : sf::FloatRect{};
 }
 
-Goomba::Goomba(float startX, float startY, float limStanga, float limDreapta) : Enemy(startX, startY, 0.05f),
-        movingLeft(true), limStanga(limStanga), limDreapta(limDreapta) {
+
+//──────────────── GOOMBA ─────────────────
+
+Goomba::Goomba(float startX, float startY, float limStanga, float limDreapta)
+    : Enemy(startX, startY, 0.05f),
+      movingLeft(true), limStanga(limStanga), limDreapta(limDreapta)
+{
     sf::Image image;
     if (!image.loadFromFile("goomba.png"))
-            throw ResourceException("Lipsa goomba.png");
-
+        throw ResourceException("Lipsa goomba.png");
 
     image.createMaskFromColor(sf::Color::White);
     texture.loadFromImage(image);
 
-    //setez sprite
-    sprite.setTexture(texture);
+    sprite = new sf::Sprite(texture);
 
-    //centrare img
-    sf::FloatRect bounds = sprite.getLocalBounds();
-    sprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
+    auto bounds = sprite->getLocalBounds();
+    sprite->setOrigin({bounds.size.x / 2.f, bounds.size.y / 2.f});
 
-    sprite.setScale(0.05f, 0.05f);
-
-    sprite.setPosition(x * 60.0f, y * 60.0f);
-
-
+    sprite->setScale({0.05f, 0.05f});
+    sprite->setPosition({x * 60.f, y * 60.f});
 }
 
 void Goomba::update(float dt) {
+    //Detectare lovire zid
+
+    if (speed < 0) {
+        speed = std::abs(speed);
+        movingLeft = !movingLeft; // Inversare directie
+    }
+
+    // Calc distanta miscare
+    float moveAmount = speed * dt * 60.f;
+
+
     if (movingLeft)
-        x-=speed*dt*60;
+        x -= moveAmount;
     else
-        x+=speed*dt*60;
-    if (x<limStanga)
-            movingLeft = false;
-    if (x>limDreapta)
-            movingLeft = true;
-    if (!movingLeft) {
-        sprite.setScale(0.05f, 0.05f);
+        x += moveAmount;
+
+    // 4. VERIFICARE LIMITE PATRULARE
+    if (x <= limStanga) {
+        x = limStanga;
+        movingLeft = false;
     }
-    else
-    {
-        sprite.setScale(-0.05f, 0.05f);
+    if (x >= limDreapta) {
+        x = limDreapta;
+        movingLeft = true;
     }
+
+    //oglindire
+    sprite->setScale({movingLeft ? -0.05f : 0.05f, 0.05f});
 }
+
 void Goomba::reaction() { std::cout << "Goomba strivit!\n"; }
 Enemy* Goomba::clone() const { return new Goomba(*this); }
 
-Koopa::Koopa(float startX, float startY, float limStanga, float limDreapta) : Enemy(startX, startY, 0.07f),
-            limStanga(limStanga), limDreapta(limDreapta) {
+
+//──────────────── KOOPA ─────────────────
+
+Koopa::Koopa(float startX, float startY, float limStanga, float limDreapta)
+    : Enemy(startX, startY, 0.07f),
+      limStanga(limStanga), limDreapta(limDreapta)
+{
     sf::Image image;
     if (!image.loadFromFile("koopa.png"))
         throw ResourceException("Lipsa koopa.png");
+
     texture.loadFromImage(image);
+    sprite = new sf::Sprite(texture);
 
-    sprite.setTexture(texture);
+    auto bounds = sprite->getLocalBounds();
+    sprite->setOrigin({bounds.size.x / 2.f, bounds.size.y / 2.f});
+    sprite->setScale({0.05f, 0.05f});
 
-    sf::FloatRect bounds = sprite.getLocalBounds();
-    sprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
-
-    sprite.setScale(0.08f, 0.08f);
-
-    sprite.setPosition(x * 60.0f, y * 60.0f);
+    // Ajustare spawn
+    this->x = startX + 0.5f;
+    this->y = startY - 0.5f;
+    sprite->setPosition({this->x * 60.f, this->y * 60.f});
 }
 
 void Koopa::update(float dt) {
-    x-=speed*dt*60;
-    if (x<limStanga)
-        x=limDreapta;
+
+
+    bool movingLeft = (speed > 0); // x -= speed,pozitiv = stânga
+
+    // Flip Sprite
+    if (movingLeft) sprite->setScale({0.05f, 0.05f});
+    else sprite->setScale({-0.05f, 0.05f});
+
+    x -= speed * dt * 60.f;
+
+
+    if (x < limStanga) x = limDreapta;
+    if (x > limDreapta + 10.0f) x = limStanga;
 }
 
 void Koopa::reaction() { std::cout << "Koopa s-a ascuns!\n"; }
 Enemy* Koopa::clone() const { return new Koopa(*this); }
 
-PiranhaPlant::PiranhaPlant(float startX, float startY, float limSus, float limJos) : Enemy(startX, startY, 0.03f),
-                            goingUp(true), limSus(limSus), limJos(limJos) {
+
+//──────────────── PIRANHA PLANT ─────────────────-
+
+PiranhaPlant::PiranhaPlant(float startX, float startY, float limSus, float limJos)
+    : Enemy(startX, startY, 0.03f),
+      originalY((startY * 60.f + 80.f) / 57.5f),
+      goingUp(true), limSus(limSus), limJos(limJos),
+      timer(0.f)
+{
+    sf::Image image;
+    if (!image.loadFromFile("plant.png"))
+        throw ResourceException("Lipsa plant.png");
+
+    texture.loadFromImage(image);
+
+    sprite = new sf::Sprite(texture);
+
+    auto bounds = sprite->getLocalBounds();
+    sprite->setOrigin({bounds.size.x / 2.f, bounds.size.y / 2.f});
+
+    sprite->setScale({0.1f, 0.1f});
+
     this->x = startX + 0.5f;
 
-    //coordonate pixel
-    float startPixelY = startY * 60.0f + 80.0f; // +80 ca sa fie adanc in teava
-    this->y = startPixelY / 57.5f;
+    y = originalY;
 
-    this->originalY = this->y;
-    this->goingUp = true;
-
-    sf::Image image;
-
-    if (!image.loadFromFile("plant.png")) throw ResourceException("Lipsa plant.png");;
-    
-    texture.loadFromImage(image);
-    sprite.setTexture(texture);
-
-    sf::FloatRect bounds = sprite.getLocalBounds();
-    sprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
-    sprite.setScale(0.1f, 0.1f);
+    //Setare pozitie
+    sprite->setPosition({x * 60.f, y * 60.f});
 }
 
 void PiranhaPlant::update(float dt) {
-    float moveSpeed = speed * dt * 60.0f;
+    float moveSpeed = speed * dt * 60.f;
 
     if (goingUp) {
         y -= moveSpeed;
-
-        // Daca a ajuns sus (limita sus)
         if (y <= originalY - limSus) {
-            y = originalY - limSus; //Fixare pozitie
-
-            // Start Pauza Sus
+            y = originalY - limSus;
             timer += dt;
-            if (timer > 2.0f) { // Sta 2 secunde sus
-                timer = 0.0f;
-                goingUp = false; // Incepe sa coboare
+            if (timer >= 2.f) {
+                timer = 0.f;
+                goingUp = false;
             }
         }
     }
     else {
-        //COBOARA
         y += moveSpeed;
-
-        // Daca a ajuns jos (pozitia originala)
         if (y >= originalY) {
-            y = originalY; // Fixare pozitia
-
-            // Start Pauza Jos
+            y = originalY;
             timer += dt;
-            if (timer > 2.0f) { // Sta 2 secunde ascunsa
-                timer = 0.0f;
-                goingUp = true; // Incepe sa urce
+            if (timer >= 2.f) {
+                timer = 0.f;
+                goingUp = true;
             }
         }
     }
 }
 
-
-
 void PiranhaPlant::reaction() { std::cout << "DAMAGE!\n"; }
 Enemy* PiranhaPlant::clone() const { return new PiranhaPlant(*this); }
-
-

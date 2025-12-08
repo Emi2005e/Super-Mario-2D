@@ -1,37 +1,35 @@
-
 #ifndef PROIECT_POO_ENEMY_H
 #define PROIECT_POO_ENEMY_H
 
 #include <iostream>
 #include <SFML/Graphics.hpp>
 
-
 class Enemy {
 protected:
-    float x,y;
-    int direction;
+    float x, y;
     float speed;
-    float gravity;
     bool isAlive;
     static int enemyCount;
+
     sf::Texture texture;
-    sf::Sprite sprite;
+    sf::Sprite* sprite;
+
 public:
     Enemy();
     Enemy(float startX, float startY, float startSpeed);
-    virtual ~Enemy(){enemyCount--;}
+    virtual ~Enemy(); // definit în .cpp
 
-    virtual void update(float dt)=0;
-    virtual void reaction()=0;
-    virtual Enemy* clone() const =0;
+    virtual void update(float dt) = 0;
+    virtual void reaction() = 0;
+    virtual Enemy* clone() const = 0;
+
     void draw(sf::RenderWindow& window);
     virtual bool canBeStomped() const { return true; }
     virtual bool hasGravity() const { return true; }
-    void setY(float newY) {
-        y=newY;
-    }
-    static int getCount() { return enemyCount; }
-
+    void setY(float newY);
+    void setX(float newX);
+    void changeDirection();
+    sf::Sprite& getSprite();
 
     [[nodiscard]] float getX() const;
     [[nodiscard]] float getY() const;
@@ -40,12 +38,12 @@ public:
 
     sf::FloatRect getGlobalBounds() const;
 
-    friend std::ostream& operator<<(std::ostream& os, const Enemy& enemy);
-    friend std::istream& operator>>(std::istream& is, Enemy& enemy);
 protected:
     virtual void doDraw(sf::RenderWindow& window);
-
 };
+
+
+//──────────── GOOMBA ─────────────────
 
 class Goomba : public Enemy {
 private:
@@ -58,6 +56,9 @@ public:
     Enemy* clone() const override;
 };
 
+
+//──────────── KOOPA ─────────────────
+
 class Koopa : public Enemy {
 private:
     float limStanga, limDreapta;
@@ -68,12 +69,15 @@ public:
     Enemy* clone() const override;
 };
 
+
+//──────────── PIRANHA ─────────────────
+
 class PiranhaPlant : public Enemy {
 private:
     float originalY;
     bool goingUp;
     float limSus, limJos;
-    float timer;
+    float timer = 0.f;
 public:
     PiranhaPlant(float startX, float startY, float limSus, float limJos);
     void update(float dt) override;
@@ -83,7 +87,4 @@ public:
     Enemy* clone() const override;
 };
 
-
-
-
-#endif //PROIECT_POO_ENEMY_H
+#endif // PROIECT_POO_ENEMY_H

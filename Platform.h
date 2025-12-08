@@ -17,13 +17,13 @@ private:
     bool isEmpty;
     bool isSolid;
     PowerUpType forcedReward;
-    sf::Sprite sprite;
+    sf::Sprite* sprite;
     sf::Texture texture;
 public:
-    Platform()=default;
+    Platform();
     Platform(float in_x, float in_y, BlockType in_type, bool in_isDestructible, bool in_isEmpty, bool in_isSolid);
     Platform(const Platform& platform);
-    ~Platform()=default;
+    ~Platform();
     friend std::ostream& operator<<(std::ostream& os, const Platform& platform);
     friend std::istream& operator>>(std::istream& is, Platform& platform);
     Platform& operator=(const Platform& other);

@@ -56,8 +56,17 @@ endif()
 ###############################################################################
 
 # NOTE: update executable name in .github/workflows/cmake.yml:25 when changing name here
-add_executable(${MAIN_EXECUTABLE_NAME}
-    main.cpp
+add_executable(${MAIN_EXECUTABLE_NAME} main.cpp Player.cpp Player.h
+        Enemy.cpp
+        Enemy.h
+        Platform.cpp
+        Platform.h
+        Enums.h
+        Level.cpp
+        Level.h
+        Powerup.cpp
+        Powerup.h
+        Exceptions.h
     generated/src/Helper.cpp
 )
 
