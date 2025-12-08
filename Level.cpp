@@ -4,8 +4,7 @@
 
 Level::Level()=default;
 
-Level::Level(const Level& other) {
-    platforms = other.platforms;
+Level::Level(const Level& other): platforms(other.platforms) {
     for (const auto* enemy : other.enemies)
         enemies.push_back(enemy->clone());
     for (const auto* p : other.powerups)
@@ -151,8 +150,8 @@ void Level::update(Player& player, float dt) {
 
 void Level::draw(sf::RenderWindow& window) const {
     for (auto* enemy : enemies) enemy->draw(window);
-    for (auto* p : powerups) p->draw(window);
-    for (auto& platform : platforms) platform.draw(window);
+    for (const auto* p : powerups) p->draw(window);
+    for (const auto& platform : platforms) platform.draw(window);
 }
 
 void Level::handlePlayerInteractions(Player& player) const {
