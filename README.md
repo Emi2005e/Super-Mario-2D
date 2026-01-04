@@ -1,4 +1,6 @@
-# Nu primesc notă pentru că nu am pus titlu și descriere
+Super Mario 2D
+
+Super Mario 2D este un joc de tip platformer, realizat folosind C++ si concepte OOP, in care player-ul(mario) trebuie sa ajunga la capatul nivelului fara ca el sa isi piarda toate vietile. Player-ul are la dispozitie diverse powerup-uri(Mushroom, Fire Flower si Star) dar si inamici(goomba, koopa si piranha plant) care reprezinta o amenintare pentru Mario. 
 
 ### Folosiți template-ul corespunzător grupei voastre!
 
